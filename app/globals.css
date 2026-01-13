@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Creepster&family=Nosifer&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Creepster&family=Nosifer&family=Inter:wght@300;400;500;600;700&display=swap');
+@import 'katex/dist/katex.min.css';
 
 * {
   box-sizing: border-box;
@@ -6,7 +7,19 @@
   margin: 0;
 }
 
-.stinky-body {
+/* App Container with Mode Classes */
+.app-container {
+  min-height: 100vh;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.app-container.transitioning {
+  filter: blur(2px);
+  transform: scale(0.98);
+}
+
+/* Bijo Mode Styles */
+.bijo-mode {
   font-family: 'Creepster', cursive;
   background: linear-gradient(45deg, #2d1b0e, #4a3728, #1a0f08);
   background-size: 400% 400%;
@@ -17,14 +30,32 @@
   overflow-x: hidden;
 }
 
+/* Normal Mode Styles */
+.normal-mode {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-size: 400% 400%;
+  animation: normalGradient 10s ease infinite;
+  color: #ffffff;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+@keyframes normalGradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 @keyframes stinkyGradient {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
 
-/* Stink clouds floating animation */
-.stinky-body::before {
+/* Stink clouds floating animation - Bijo mode only */
+.bijo-mode::before {
   content: '💨 💩 🤢 💨 🦨 💨 💩 🤮 💨';
   position: fixed;
   top: -50px;
@@ -52,17 +83,164 @@
 }
 
 .header {
-  text-align: center;
   margin-bottom: 30px;
   padding: 20px;
-  background: rgba(139, 69, 19, 0.3);
   border-radius: 15px;
+  position: relative;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bijo-mode .header {
+  background: rgba(139, 69, 19, 0.3);
   border: 3px solid #8b4513;
   box-shadow: 0 0 20px rgba(139, 69, 19, 0.5);
+}
+
+.normal-mode .header {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.title-section {
+  flex: 1;
+  text-align: center;
+}
+
+.mode-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 25px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.bijo-mode .mode-toggle {
+  background: linear-gradient(45deg, #d4af37, #b8941f);
+  color: #2d1b0e;
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+}
+
+.normal-mode .mode-toggle {
+  background: linear-gradient(45deg, #ffffff, #f0f0f0);
+  color: #333333;
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+}
+
+.mode-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.mode-toggle:active {
+  transform: translateY(0);
+}
+
+.mode-toggle:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.toggle-icon {
+  font-size: 1.2rem;
+  transition: transform 0.3s ease;
+}
+
+.mode-toggle:hover .toggle-icon {
+  transform: scale(1.1);
+}
+
+.toggle-text {
+  font-family: inherit;
+  font-weight: 600;
+}
+
+.mode-selector {
   position: relative;
 }
 
-.header::after {
+.dropdown-arrow {
+  margin-left: 8px;
+  font-size: 0.8rem;
+  transition: transform 0.3s ease;
+}
+
+.mode-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  overflow: hidden;
+  z-index: 1000;
+  min-width: 150px;
+}
+
+.mode-option {
+  display: block;
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  background: transparent;
+  color: #333333;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.mode-option:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.mode-option.active {
+  background: rgba(102, 126, 234, 0.2);
+  color: #667eea;
+  font-weight: 600;
+}
+
+.bijo-mode .mode-dropdown {
+  background: rgba(139, 69, 19, 0.95);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.bijo-mode .mode-option {
+  color: #d4af37;
+  font-family: 'Creepster', cursive;
+}
+
+.bijo-mode .mode-option:hover {
+  background: rgba(212, 175, 55, 0.2);
+}
+
+.bijo-mode .mode-option.active {
+  background: rgba(212, 175, 55, 0.3);
+  color: #ffffff;
+}
+
+.bijo-mode .header::after {
   content: '🐍💩🐍';
   position: absolute;
   top: -15px;
@@ -77,12 +255,24 @@
 }
 
 .title {
-  font-family: 'Nosifer', cursive;
   font-size: 3rem;
+  margin-bottom: 10px;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bijo-mode .title {
+  font-family: 'Nosifer', cursive;
   color: #8b4513;
   text-shadow: 3px 3px 0px #654321, 6px 6px 10px rgba(0,0,0,0.5);
-  margin-bottom: 10px;
   animation: slither 3s ease-in-out infinite;
+}
+
+.normal-mode .title {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  letter-spacing: -0.02em;
 }
 
 @keyframes slither {
@@ -93,19 +283,41 @@
 
 .subtitle {
   font-size: 1.2rem;
-  color: #d4af37;
   font-style: italic;
   opacity: 0.8;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bijo-mode .subtitle {
+  color: #d4af37;
+  font-family: 'Creepster', cursive;
+}
+
+.normal-mode .subtitle {
+  color: rgba(255, 255, 255, 0.9);
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
 }
 
 .chat-container {
-  background: rgba(101, 67, 33, 0.4);
   border-radius: 20px;
-  border: 2px solid #8b4513;
   padding: 20px;
   min-height: 500px;
-  box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
   position: relative;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bijo-mode .chat-container {
+  background: rgba(101, 67, 33, 0.4);
+  border: 2px solid #8b4513;
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
+}
+
+.normal-mode .chat-container {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
 }
 
 .chat-messages {
@@ -113,9 +325,18 @@
   overflow-y: auto;
   margin-bottom: 20px;
   padding: 15px;
-  background: rgba(0,0,0,0.2);
   border-radius: 10px;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bijo-mode .chat-messages {
+  background: rgba(0,0,0,0.2);
   border: 1px solid #654321;
+}
+
+.normal-mode .chat-messages {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .message {
@@ -127,17 +348,35 @@
 }
 
 .user-message {
-  background: rgba(212, 175, 55, 0.2);
-  border: 1px solid #d4af37;
   margin-left: auto;
   text-align: right;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bijo-mode .user-message {
+  background: rgba(212, 175, 55, 0.2);
+  border: 1px solid #d4af37;
+}
+
+.normal-mode .user-message {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .bot-message {
-  background: rgba(139, 69, 19, 0.3);
-  border: 1px solid #8b4513;
   margin-right: auto;
   position: relative;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bijo-mode .bot-message {
+  background: rgba(139, 69, 19, 0.3);
+  border: 1px solid #8b4513;
+}
+
+.normal-mode .bot-message {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .bot-message::before {
@@ -158,14 +397,25 @@
 .message-input {
   flex: 1;
   padding: 15px;
-  background: rgba(0,0,0,0.3);
-  border: 2px solid #8b4513;
   border-radius: 10px;
-  color: #d4af37;
-  font-family: 'Creepster', cursive;
   font-size: 1rem;
   resize: vertical;
   min-height: 50px;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bijo-mode .message-input {
+  background: rgba(0,0,0,0.3);
+  border: 2px solid #8b4513;
+  color: #d4af37;
+  font-family: 'Creepster', cursive;
+}
+
+.normal-mode .message-input {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
 }
 
 .message-input::placeholder {
@@ -181,21 +431,39 @@
 
 .send-button {
   padding: 15px 25px;
-  background: linear-gradient(45deg, #8b4513, #654321);
-  border: 2px solid #d4af37;
   border-radius: 10px;
-  color: #d4af37;
-  font-family: 'Creepster', cursive;
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
+  border: 2px solid;
 }
 
-.send-button:hover {
+.bijo-mode .send-button {
+  background: linear-gradient(45deg, #8b4513, #654321);
+  border-color: #d4af37;
+  color: #d4af37;
+  font-family: 'Creepster', cursive;
+}
+
+.normal-mode .send-button {
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+}
+
+.bijo-mode .send-button:hover {
   background: linear-gradient(45deg, #654321, #8b4513);
   transform: scale(1.05);
   box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+}
+
+.normal-mode .send-button:hover {
+  background: linear-gradient(45deg, #764ba2, #667eea);
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
 }
 
 .send-button:active {
@@ -208,18 +476,35 @@
 
 .upload-button {
   padding: 10px 15px;
-  background: rgba(139, 69, 19, 0.6);
-  border: 2px solid #8b4513;
   border-radius: 8px;
-  color: #d4af37;
-  font-family: 'Creepster', cursive;
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 0.9rem;
+  border: 2px solid;
 }
 
-.upload-button:hover {
+.bijo-mode .upload-button {
+  background: rgba(139, 69, 19, 0.6);
+  border-color: #8b4513;
+  color: #d4af37;
+  font-family: 'Creepster', cursive;
+}
+
+.normal-mode .upload-button {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+}
+
+.bijo-mode .upload-button:hover {
   background: rgba(139, 69, 19, 0.8);
+  transform: translateY(-2px);
+}
+
+.normal-mode .upload-button:hover {
+  background: rgba(255, 255, 255, 0.2);
   transform: translateY(-2px);
 }
 

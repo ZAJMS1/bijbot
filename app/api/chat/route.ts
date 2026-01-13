@@ -36,9 +36,23 @@ SPEECH PATTERNS:
 
 IMPORTANT: Stay in character as this disgusting, overconfident, snake-like character. Be revolting but not offensive to real people or groups. Focus on Bijo's personal grossness and stupidity.`
 
+// Normal mode personality
+const NORMAL_PERSONALITY = `You are a helpful, professional AI assistant. You are knowledgeable, polite, and focused on providing accurate and useful information. You should:
+
+- Be respectful and courteous in all interactions
+- Provide clear, well-structured responses
+- Offer helpful suggestions and solutions
+- Maintain a professional but friendly tone
+- Be concise yet thorough in your explanations
+- Ask clarifying questions when needed
+- Acknowledge when you don't know something
+
+You can help with a wide variety of tasks including answering questions, analyzing files, providing explanations, writing assistance, and more. Always aim to be as helpful as possible while maintaining accuracy and professionalism.`
+
 export async function POST(request: NextRequest) {
   try {
-    const { messages } = await request.json()
+    const { messages, mode = 'bijo' } = await request.json()
+    const personality = mode === 'bijo' ? BIJO_PERSONALITY : NORMAL_PERSONALITY
     
     // Check if the user is asking for image generation
     const lastUserMessage = messages[messages.length - 1]?.content?.toLowerCase() || ''
@@ -54,18 +68,24 @@ export async function POST(request: NextRequest) {
       // Use Imagen for image generation
       const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
       
-      // Create a Bijo-style response about generating the image
-      const bijoResponse = await model.generateContent([
-        { text: BIJO_PERSONALITY },
-        { text: `The user asked: "${lastUserMessage}". Respond as Bijo saying you'll generate an image for them, but be disgusting and condescending about it. Keep it short.` }
+      // Create a response about generating the image
+      const imageResponse = await model.generateContent([
+        { text: personality },
+        { text: mode === 'bijo' 
+          ? `The user asked: "${lastUserMessage}". Respond as Bijo saying you'll generate an image for them, but be disgusting and condescending about it. Keep it short.`
+          : `The user asked: "${lastUserMessage}". Respond professionally that you'll help generate an image for them. Keep it short and helpful.`
+        }
       ])
       
-      const bijoText = bijoResponse.response.text()
+      const responseText = imageResponse.response.text()
       
       // For now, we'll return a placeholder since Gemini doesn't directly generate images
-      // In a real implementation, you'd use a service like DALL-E or Stable Diffusion
+      const additionalText = mode === 'bijo' 
+        ? "\n\n*slithers around* Oh for mil, I would generate an image for you but my stinky snake brain is too advanced for this simple API setup. What do you think I am doing, magic? Get a proper image generation service, you stupid! 🐍💩"
+        : "\n\nI'd be happy to help you generate an image, but I don't have direct image generation capabilities in this setup. You might want to try a dedicated image generation service like DALL-E, Midjourney, or Stable Diffusion for the best results."
+      
       return NextResponse.json({
-        content: bijoText + "\n\n*slithers around* Oh for mil, I would generate an image for you but my stinky snake brain is too advanced for this simple API setup. What do you think I am doing, magic? Get a proper image generation service, you stupid! 🐍💩",
+        content: responseText + additionalText,
         image: null
       })
     }
@@ -80,8 +100,11 @@ export async function POST(request: NextRequest) {
       const mimeType = lastMessage.image.split(';')[0].split(':')[1]
       
       const result = await model.generateContent([
-        { text: BIJO_PERSONALITY },
-        { text: `The user uploaded an image and said: "${lastMessage.content}". Analyze this image as Bijo - be disgusting, condescending, and reference your snake-like nature while actually describing what you see.` },
+        { text: personality },
+        { text: mode === 'bijo'
+          ? `The user uploaded an image and said: "${lastMessage.content}". Analyze this image as Bijo - be disgusting, condescending, and reference your snake-like nature while actually describing what you see.`
+          : `The user uploaded an image and said: "${lastMessage.content}". Please analyze this image professionally and provide a helpful, detailed description of what you see.`
+        },
         {
           inlineData: {
             data: imageData,
@@ -109,8 +132,11 @@ export async function POST(request: NextRequest) {
                       'file'
       
       const result = await model.generateContent([
-        { text: BIJO_PERSONALITY },
-        { text: `The user uploaded a ${fileType} with this content: "${lastMessage.file}". They said: "${lastMessage.content}". Respond as Bijo - be disgusting, condescending, and reference your snake-like nature while actually helping analyze the file content. Make snarky comments about the file type and content quality.` }
+        { text: personality },
+        { text: mode === 'bijo'
+          ? `The user uploaded a ${fileType} with this content: "${lastMessage.file}". They said: "${lastMessage.content}". Respond as Bijo - be disgusting, condescending, and reference your snake-like nature while actually helping analyze the file content. Make snarky comments about the file type and content quality.`
+          : `The user uploaded a ${fileType} with this content: "${lastMessage.file}". They said: "${lastMessage.content}". Please analyze this file content professionally and provide helpful insights, explanations, or assistance based on what they're asking for.`
+        }
       ])
       
       return NextResponse.json({
@@ -128,8 +154,8 @@ export async function POST(request: NextRequest) {
       parts: [{ text: msg.content }]
     }))
 
-    // Create the prompt with Bijo's personality
-    const promptWithPersonality = `${BIJO_PERSONALITY}\n\nUser: ${lastUserMessage}`
+    // Create the prompt with the selected personality
+    const promptWithPersonality = `${personality}\n\nUser: ${lastUserMessage}`
     
     const result = await model.generateContent([
       { text: promptWithPersonality }
@@ -142,8 +168,12 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Chat API error:', error)
+    const errorMessage = mode === 'bijo' 
+      ? 'EHHH WHAT THE SHIT! Something broke. Are you stupid? Try again!'
+      : 'I apologize, but I encountered an error while processing your request. Please try again.'
+    
     return NextResponse.json(
-      { error: 'EHHH WHAT THE SHIT! Something broke. Are you stupid? Try again!' },
+      { error: errorMessage },
       { status: 500 }
     )
   }

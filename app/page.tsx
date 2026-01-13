@@ -2,6 +2,9 @@
 
 import { useState, useRef, useEffect } from 'react'
 import ReactMarkdown from 'react-markdown'
+import { InlineMath, BlockMath } from 'react-katex'
+import remarkMath from 'remark-math'
+import rehypeKatex from 'rehype-katex'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -11,10 +14,18 @@ interface Message {
 }
 
 export default function Home() {
+  const [currentMode, setCurrentMode] = useState<'bijo' | 'normal'>('bijo')
+  const [isTransitioning, setIsTransitioning] = useState(false)
+  const [showModeDropdown, setShowModeDropdown] = useState(false)
+  
+  const bijoWelcome = 'Oh for mil? What do you think I am doing here, just slithering around for no reason? I\'m Bijo, the smartest AI you\'ll ever meet, even though you probably can\'t comprehend my genius. What do you want? And don\'t ask me stupid questions - I can examine ANY file you throw at me: images, PDFs, code files, documents, text files, CSVs, audio, video, archives, or whatever garbage you have. I can also generate images and chat. But make it quick, I have important snake business to attend to. 🐍💩'
+  
+  const normalWelcome = 'Hello! I\'m your AI assistant. I can help you with a wide variety of tasks including analyzing files, answering questions, generating content, and more. I can process images, PDFs, documents, code files, and many other file types. How can I assist you today?'
+  
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: 'Oh for mil? What do you think I am doing here, just slithering around for no reason? I\'m Bijo, the smartest AI you\'ll ever meet, even though you probably can\'t comprehend my genius. What do you want? And don\'t ask me stupid questions - I can examine ANY file you throw at me: images, PDFs, code files, documents, text files, CSVs, audio, video, archives, or whatever garbage you have. I can also generate images and chat. But make it quick, I have important snake business to attend to. 🐍💩'
+      content: bijoWelcome
     }
   ])
   const [input, setInput] = useState('')
@@ -36,6 +47,50 @@ export default function Home() {
   useEffect(() => {
     scrollToBottom()
   }, [messages])
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showModeDropdown) {
+        const target = event.target as HTMLElement
+        if (!target.closest('.mode-selector')) {
+          setShowModeDropdown(false)
+        }
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [showModeDropdown])
+
+  const switchMode = (newMode: 'bijo' | 'normal') => {
+    if (newMode === currentMode) {
+      setShowModeDropdown(false)
+      return
+    }
+    
+    setIsTransitioning(true)
+    setShowModeDropdown(false)
+    
+    setTimeout(() => {
+      setCurrentMode(newMode)
+      
+      // Update welcome message when switching modes
+      setMessages([{
+        role: 'assistant',
+        content: newMode === 'bijo' ? bijoWelcome : normalWelcome
+      }])
+      
+      // Clear any uploaded file and input
+      setUploadedFile(null)
+      setInput('')
+      setError('')
+      
+      setTimeout(() => {
+        setIsTransitioning(false)
+      }, 300)
+    }, 300)
+  }
 
   const handleFileUpload = async (file: File) => {
     const formData = new FormData()
@@ -65,7 +120,10 @@ export default function Home() {
         setError(errorData.error || 'Failed to process file')
       }
     } catch (err) {
-      setError('EHHH WHAT THE SHIT! Failed to upload file. Are you stupid?')
+      const errorMessage = currentMode === 'bijo'
+        ? 'EHHH WHAT THE SHIT! Failed to upload file. Are you stupid?'
+        : 'Failed to upload file. Please try again.'
+      setError(errorMessage)
     }
   }
 
@@ -95,7 +153,8 @@ export default function Home() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          messages: [...messages, newUserMessage]
+          messages: [...messages, newUserMessage],
+          mode: currentMode
         }),
       })
 
@@ -111,7 +170,10 @@ export default function Home() {
         image: data.image
       }])
     } catch (err) {
-      setError('EHHH WHAT THE SHIT! Something went wrong. Are you stupid? Try again!')
+      const errorMessage = currentMode === 'bijo'
+        ? 'EHHH WHAT THE SHIT! Something went wrong. Are you stupid? Try again!'
+        : 'I apologize, but something went wrong. Please try again.'
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }
@@ -125,11 +187,51 @@ export default function Home() {
   }
 
   return (
-    <div className="container">
-      <div className="header">
-        <h1 className="title">BIJO AI</h1>
-        <p className="subtitle">The Stinkiest, Most Revolting AI Assistant</p>
-      </div>
+    <div className={`app-container ${currentMode === 'bijo' ? 'bijo-mode' : 'normal-mode'} ${isTransitioning ? 'transitioning' : ''}`}>
+      <div className="container">
+        <div className="header">
+          <div className="header-content">
+            <div className="title-section">
+              <h1 className="title">
+                {currentMode === 'bijo' ? 'BIJO AI' : 'AI Assistant'}
+              </h1>
+              <p className="subtitle">
+                {currentMode === 'bijo'
+                  ? 'The Stinkiest, Most Revolting AI Assistant' 
+                  : 'Your Intelligent Assistant for Any Task'
+                }
+              </p>
+            </div>
+            <div className="mode-selector">
+              <button 
+                onClick={() => setShowModeDropdown(!showModeDropdown)}
+                className="mode-toggle"
+                disabled={isTransitioning}
+              >
+                <span className="toggle-text">
+                  {currentMode === 'bijo' ? 'Bijo Mode' : 'Normal Mode'}
+                </span>
+                <span className="dropdown-arrow">▼</span>
+              </button>
+              {showModeDropdown && (
+                <div className="mode-dropdown">
+                  <button 
+                    onClick={() => switchMode('bijo')}
+                    className={`mode-option ${currentMode === 'bijo' ? 'active' : ''}`}
+                  >
+                    🐍 Bijo Mode
+                  </button>
+                  <button 
+                    onClick={() => switchMode('normal')}
+                    className={`mode-option ${currentMode === 'normal' ? 'active' : ''}`}
+                  >
+                    Normal Mode
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
 
       <div className="chat-container">
         <div className="chat-messages">
@@ -138,9 +240,14 @@ export default function Home() {
               {message.image && message.role === 'user' && (
                 <img src={message.image} alt="Uploaded" className="image-preview" />
               )}
-              {message.role === 'assistant' ? (
-                <ReactMarkdown>{message.content}</ReactMarkdown>
-              ) : (
+                  {message.role === 'assistant' ? (
+                    <ReactMarkdown 
+                      remarkPlugins={[remarkMath]}
+                      rehypePlugins={[rehypeKatex]}
+                    >
+                      {message.content}
+                    </ReactMarkdown>
+                  ) : (
                 <div>{message.content}</div>
               )}
               {message.image && message.role === 'assistant' && (
@@ -151,7 +258,12 @@ export default function Home() {
           {loading && (
             <div className="message bot-message">
               <div className="loading">
-                <span>Bijo is slithering around thinking</span>
+                <span>
+                  {currentMode === 'bijo' 
+                    ? 'Bijo is slithering around thinking' 
+                    : 'Processing your request'
+                  }
+                </span>
                 <span className="loading-dots">...</span>
               </div>
             </div>
@@ -201,7 +313,12 @@ accept="*"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder={uploadedFile ? `Describe what you want Bijo to do with ${uploadedFile.name}...` : "Ask Bijo something... if you dare 🐍"}
+            placeholder={uploadedFile 
+              ? `Describe what you want ${currentMode === 'bijo' ? 'Bijo' : 'me'} to do with ${uploadedFile.name}...` 
+              : currentMode === 'bijo'
+                ? "Ask Bijo something... if you dare 🐍" 
+                : "How can I help you today?"
+            }
             className="message-input"
             disabled={loading}
           />
@@ -211,10 +328,14 @@ accept="*"
             disabled={loading}
             className="send-button"
           >
-            {loading ? '🐍💭' : '💩 Send'}
+            {loading 
+              ? (currentMode === 'bijo' ? '🐍💭' : 'Thinking...') 
+              : (currentMode === 'bijo' ? '💩 Send' : 'Send')
+            }
           </button>
         </div>
       </div>
+    </div>
     </div>
   )
 }
