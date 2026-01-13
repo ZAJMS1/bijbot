@@ -50,8 +50,11 @@ const NORMAL_PERSONALITY = `You are a helpful, professional AI assistant. You ar
 You can help with a wide variety of tasks including answering questions, analyzing files, providing explanations, writing assistance, and more. Always aim to be as helpful as possible while maintaining accuracy and professionalism.`
 
 export async function POST(request: NextRequest) {
+  let mode = 'bijo' // Default mode
   try {
-    const { messages, mode = 'bijo' } = await request.json()
+    const requestData = await request.json()
+    mode = requestData.mode || 'bijo'
+    const { messages } = requestData
     const personality = mode === 'bijo' ? BIJO_PERSONALITY : NORMAL_PERSONALITY
     
     // Check if the user is asking for image generation
