@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
 
     if (isImageRequest) {
       // Use Imagen for image generation
-      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+      const model = genAI.getGenerativeModel({ model: 'gemini-3-flash' })
       
       // Create a response about generating the image
       const imageResponse = await model.generateContent([
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
     // Handle image analysis
     const lastMessage = messages[messages.length - 1]
     if (lastMessage?.image) {
-      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+      const model = genAI.getGenerativeModel({ model: 'gemini-3-flash' })
       
       // Convert base64 image to the format Gemini expects
       const imageData = lastMessage.image.split(',')[1]
@@ -121,7 +121,7 @@ export async function POST(request: NextRequest) {
 
     // Handle file content (PDFs, text files, code, etc.)
     if (lastMessage?.file) {
-      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+      const model = genAI.getGenerativeModel({ model: 'gemini-3-flash' })
       
       // Determine file type from the user message
       const fileType = lastMessage.content.toLowerCase().includes('pdf') ? 'PDF' :
@@ -146,7 +146,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Regular text conversation
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+    const model = genAI.getGenerativeModel({ model: 'gemini-3-flash' })
     
     // Build conversation history for context
     const conversationHistory = messages.map((msg: any) => ({
