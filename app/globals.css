@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Creepster&family=Nosifer&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Creepster&family=Nosifer&family=Griffy&family=Butcherman&family=Inter:wght@300;400;500;600;700&display=swap');
 @import 'katex/dist/katex.min.css';
 
 * {
@@ -20,7 +20,7 @@
 
 /* Bijo Mode Styles */
 .bijo-mode {
-  font-family: 'Creepster', cursive;
+  font-family: 'Griffy', cursive;
   background: linear-gradient(45deg, #2d1b0e, #4a3728, #1a0f08);
   background-size: 400% 400%;
   animation: stinkyGradient 8s ease infinite;
@@ -228,7 +228,7 @@
 
 .bijo-mode .mode-option {
   color: #d4af37;
-  font-family: 'Creepster', cursive;
+  font-family: 'Griffy', cursive;
 }
 
 .bijo-mode .mode-option:hover {
@@ -290,7 +290,7 @@
 
 .bijo-mode .subtitle {
   color: #d4af37;
-  font-family: 'Creepster', cursive;
+  font-family: 'Griffy', cursive;
 }
 
 .normal-mode .subtitle {
@@ -408,7 +408,7 @@
   background: rgba(0,0,0,0.3);
   border: 2px solid #8b4513;
   color: #d4af37;
-  font-family: 'Creepster', cursive;
+  font-family: 'Griffy', cursive;
 }
 
 .normal-mode .message-input {
@@ -443,7 +443,7 @@
   background: linear-gradient(45deg, #8b4513, #654321);
   border-color: #d4af37;
   color: #d4af37;
-  font-family: 'Creepster', cursive;
+  font-family: 'Griffy', cursive;
 }
 
 .normal-mode .send-button {
@@ -487,7 +487,7 @@
   background: rgba(139, 69, 19, 0.6);
   border-color: #8b4513;
   color: #d4af37;
-  font-family: 'Creepster', cursive;
+  font-family: 'Griffy', cursive;
 }
 
 .normal-mode .upload-button {

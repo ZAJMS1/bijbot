@@ -17,7 +17,7 @@ export default function Home() {
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [showModeDropdown, setShowModeDropdown] = useState(false)
   
-  const bijoWelcome = 'Oh for mil? What do you think I am doing here, just slithering around for no reason? I\'m Bijo, the smartest AI you\'ll ever meet, even though you probably can\'t comprehend my genius. What do you want? And don\'t ask me stupid questions - I can examine ANY file you throw at me: images, PDFs, code files, documents, text files, CSVs, audio, video, archives, or whatever garbage you have. I can also generate images and chat. But make it quick, I have important snake business to attend to. 🐍💩'
+  const bijoWelcome = 'Oh for mil? I\'m Bijo, your slithery AI assistant! *adjusts stinky socks* I can help you with pretty much anything - analyzing files, answering questions, examining images, reading PDFs, and more. I might be a bit gross and overconfident, but I actually give good answers. What do you need help with? 🐍'
   
   const normalWelcome = 'Hello! I\'m your AI assistant. I can help you with a wide variety of tasks including analyzing files, answering questions, generating content, and more. I can process images, PDFs, documents, code files, and many other file types. How can I assist you today?'
   
