@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { InlineMath, BlockMath } from 'react-katex'
 import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
 
