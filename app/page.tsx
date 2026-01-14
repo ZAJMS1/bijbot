@@ -13,13 +13,15 @@ interface Message {
 }
 
 export default function Home() {
-  const [currentMode, setCurrentMode] = useState<'bijo' | 'normal' | 'ajai'>('bijo')
+  const [currentMode, setCurrentMode] = useState<'bijo' | 'normal' | 'ajai' | 'amir'>('bijo')
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [showModeDropdown, setShowModeDropdown] = useState(false)
   
   const bijoWelcome = 'Oh for mil? I\'m Bijo, your slithery AI assistant! *slithers confidently* I can help you with pretty much anything - analyzing files, answering questions, examining images, reading PDFs, and more. I might be overconfident, but I actually give good answers. What do you need help with? 🐍'
   
   const ajaiWelcome = '*adjusts baseball cap calmly* Hey there, Givan. I\'m AJ. I can help you with pretty much anything - analyzing files, answering questions, looking at images, reading documents. I don\'t mind tackling whatever you need. What can I do for you? ⚾'
+  
+  const amirWelcome = 'Okay ✅ i am Pratham prending! i working at Nawabs Indian Cuisine in Springfield ✅ i can helping with filesi, questionsi, imagesi, whateveri you needing! what to doing today prending ✅'
   
   const normalWelcome = 'Hello! I\'m your AI assistant. I can help you with a wide variety of tasks including analyzing files, answering questions, generating content, and more. I can process images, PDFs, documents, code files, and many other file types. How can I assist you today?'
   
@@ -64,7 +66,7 @@ export default function Home() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [showModeDropdown])
 
-  const switchMode = (newMode: 'bijo' | 'normal' | 'ajai') => {
+  const switchMode = (newMode: 'bijo' | 'normal' | 'ajai' | 'amir') => {
     if (newMode === currentMode) {
       setShowModeDropdown(false)
       return
@@ -84,6 +86,9 @@ export default function Home() {
           break
         case 'ajai':
           welcomeMessage = ajaiWelcome
+          break
+        case 'amir':
+          welcomeMessage = amirWelcome
           break
         default:
           welcomeMessage = normalWelcome
@@ -140,6 +145,9 @@ export default function Home() {
           break
         case 'ajai':
           errorMessage = 'I don\'t mind trying, Luo, but that file upload didn\'t work. Let\'s try again.'
+          break
+        case 'amir':
+          errorMessage = 'Okay ✅ file no uploading prending... somethingi wrongi ✅ Try again methodi'
           break
         default:
           errorMessage = 'Failed to upload file. Please try again.'
@@ -199,6 +207,9 @@ export default function Home() {
         case 'ajai':
           errorMessage = 'I don\'t mind that there was an error, Givan, but something went wrong. Let\'s try that again.'
           break
+        case 'amir':
+          errorMessage = 'Okay ✅ somethingi wrongi happening prending... i canting working righti now ✅ Try again methodi'
+          break
         default:
           errorMessage = 'I apologize, but something went wrong. Please try again.'
       }
@@ -216,14 +227,15 @@ export default function Home() {
   }
 
   return (
-    <div className={`app-container ${currentMode === 'bijo' ? 'bijo-mode' : currentMode === 'ajai' ? 'ajai-mode' : 'normal-mode'} ${isTransitioning ? 'transitioning' : ''}`}>
+    <div className={`app-container ${currentMode === 'bijo' ? 'bijo-mode' : currentMode === 'ajai' ? 'ajai-mode' : currentMode === 'amir' ? 'amir-mode' : 'normal-mode'} ${isTransitioning ? 'transitioning' : ''}`}>
       <div className="container">
         <div className="header">
           <div className="header-content">
             <div className="title-section">
               <h1 className="title">
                 {currentMode === 'bijo' ? 'BIJO AI' : 
-                 currentMode === 'ajai' ? 'AJ AI' : 
+                 currentMode === 'ajai' ? 'AJ AI' :
+                 currentMode === 'amir' ? 'AMIR AI' :
                  'AI Assistant'}
               </h1>
               <p className="subtitle">
@@ -231,6 +243,8 @@ export default function Home() {
                   ? 'The Slithery, Most Overconfident AI Assistant' 
                   : currentMode === 'ajai'
                   ? 'Calm, Composed Baseball Player & IB Student'
+                  : currentMode === 'amir'
+                  ? 'Friendly Springfield Restaurant Worker ✅'
                   : 'Your Intelligent Assistant for Any Task'
                 }
               </p>
@@ -243,7 +257,8 @@ export default function Home() {
               >
                 <span className="toggle-text">
                   {currentMode === 'bijo' ? 'Bijo Mode' : 
-                   currentMode === 'ajai' ? 'AJ Mode' : 
+                   currentMode === 'ajai' ? 'AJ Mode' :
+                   currentMode === 'amir' ? 'Amir Mode' :
                    'Normal Mode'}
                 </span>
                 <span className="dropdown-arrow">▼</span>
@@ -261,6 +276,12 @@ export default function Home() {
                     className={`mode-option ${currentMode === 'ajai' ? 'active' : ''}`}
                   >
                     ⚾ AJ Mode
+                  </button>
+                  <button 
+                    onClick={() => switchMode('amir')}
+                    className={`mode-option ${currentMode === 'amir' ? 'active' : ''}`}
+                  >
+                    ✅ Amir Mode
                   </button>
                   <button 
                     onClick={() => switchMode('normal')}
@@ -304,6 +325,8 @@ export default function Home() {
                     ? 'Bijo is slithering around thinking'
                     : currentMode === 'ajai'
                     ? 'AJ is calmly thinking this through'
+                    : currentMode === 'amir'
+                    ? 'Pratham is thinking what to doing ✅'
                     : 'Processing your request'
                   }
                 </span>
@@ -357,11 +380,13 @@ accept="*"
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder={uploadedFile 
-              ? `Describe what you want ${currentMode === 'bijo' ? 'Bijo' : currentMode === 'ajai' ? 'AJ' : 'me'} to do with ${uploadedFile.name}...` 
+              ? `Describe what you want ${currentMode === 'bijo' ? 'Bijo' : currentMode === 'ajai' ? 'AJ' : currentMode === 'amir' ? 'Pratham' : 'me'} to do with ${uploadedFile.name}...` 
               : currentMode === 'bijo'
                 ? "Ask Bijo something... if you dare 🐍"
                 : currentMode === 'ajai' 
                 ? "What can I help you with, Givan? ⚾"
+                : currentMode === 'amir'
+                ? "what to doing today prending ✅"
                 : "How can I help you today?"
             }
             className="message-input"
@@ -374,8 +399,8 @@ accept="*"
             className="send-button"
           >
             {loading 
-              ? (currentMode === 'bijo' ? '🐍💭' : currentMode === 'ajai' ? '⚾💭' : 'Thinking...') 
-              : (currentMode === 'bijo' ? '🐍 Send' : currentMode === 'ajai' ? '⚾ Send' : 'Send')
+              ? (currentMode === 'bijo' ? '🐍💭' : currentMode === 'ajai' ? '⚾💭' : currentMode === 'amir' ? '✅💭' : 'Thinking...') 
+              : (currentMode === 'bijo' ? '🐍 Send' : currentMode === 'ajai' ? '⚾ Send' : currentMode === 'amir' ? '✅ Send' : 'Send')
             }
           </button>
         </div>

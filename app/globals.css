@@ -30,6 +30,18 @@
   overflow-x: hidden;
 }
 
+/* Amir AI Mode Styles */
+.amir-mode {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 50%, #15803d 100%);
+  background-size: 400% 400%;
+  animation: checkmarkGradient 10s ease infinite;
+  color: #ffffff;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
 /* AJ AI Mode Styles */
 .ajai-mode {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -54,6 +66,13 @@
   overflow-x: hidden;
 }
 
+@keyframes checkmarkGradient {
+  0% { background-position: 0% 50%; }
+  33% { background-position: 100% 0%; }
+  66% { background-position: 0% 100%; }
+  100% { background-position: 0% 50%; }
+}
+
 @keyframes baseballGradient {
   0% { background-position: 0% 50%; }
   25% { background-position: 100% 25%; }
@@ -72,6 +91,21 @@
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
+}
+
+/* Checkmark floating animation - Amir mode only */
+.amir-mode::before {
+  content: '✅ 🔥 ✅ 💚 ✅ 🍃 ✅ 🎉 ✅';
+  position: fixed;
+  top: -50px;
+  left: -100px;
+  width: 120%;
+  height: 100px;
+  font-size: 2rem;
+  opacity: 0.25;
+  animation: floatCheckmarks 14s linear infinite;
+  pointer-events: none;
+  z-index: 1;
 }
 
 /* Baseball floating animation - AJ mode only */
@@ -104,6 +138,11 @@
   z-index: 1;
 }
 
+@keyframes floatCheckmarks {
+  0% { transform: translateX(-100px) rotate(0deg); }
+  100% { transform: translateX(100vw) rotate(360deg); }
+}
+
 @keyframes floatBaseball {
   0% { transform: translateX(-100px) rotate(0deg); }
   100% { transform: translateX(100vw) rotate(360deg); }
@@ -128,6 +167,13 @@
   border-radius: 15px;
   position: relative;
   transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.amir-mode .header {
+  background: rgba(34, 197, 94, 0.4);
+  border: 3px solid #22c55e;
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+  position: relative;
 }
 
 .ajai-mode .header {
@@ -175,6 +221,12 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
+}
+
+.amir-mode .mode-toggle {
+  background: linear-gradient(45deg, #22c55e, #16a34a);
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
 }
 
 .ajai-mode .mode-toggle {
@@ -274,6 +326,26 @@
   font-weight: 600;
 }
 
+.amir-mode .mode-dropdown {
+  background: rgba(34, 197, 94, 0.95);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.amir-mode .mode-option {
+  color: #dcfce7;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+}
+
+.amir-mode .mode-option:hover {
+  background: rgba(34, 197, 94, 0.2);
+}
+
+.amir-mode .mode-option.active {
+  background: rgba(34, 197, 94, 0.3);
+  color: #ffffff;
+}
+
 .ajai-mode .mode-dropdown {
   background: rgba(44, 85, 48, 0.95);
   border: 1px solid rgba(74, 124, 89, 0.3);
@@ -313,6 +385,15 @@
   color: #ffffff;
 }
 
+.amir-mode .header::after {
+  content: '✅💚✅';
+  position: absolute;
+  top: -15px;
+  right: -15px;
+  font-size: 1.5rem;
+  animation: checkmarkPulse 2.5s ease-in-out infinite;
+}
+
 .ajai-mode .header::after {
   content: '⚾🏆⚾';
   position: absolute;
@@ -331,6 +412,13 @@
   animation: wiggle 2s ease-in-out infinite;
 }
 
+@keyframes checkmarkPulse {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.15) rotate(5deg); }
+  50% { transform: scale(1) rotate(0deg); }
+  75% { transform: scale(1.15) rotate(-5deg); }
+}
+
 @keyframes baseballSpin {
   0%, 100% { transform: rotate(0deg) scale(1); }
   25% { transform: rotate(90deg) scale(1.1); }
@@ -347,6 +435,15 @@
   font-size: 3rem;
   margin-bottom: 10px;
   transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.amir-mode .title {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  color: #22c55e;
+  text-shadow: 2px 2px 0px #16a34a, 4px 4px 8px rgba(0,0,0,0.4);
+  animation: checkmarkBounce 3.5s ease-in-out infinite;
+  letter-spacing: -0.01em;
 }
 
 .ajai-mode .title {
@@ -373,6 +470,13 @@
   letter-spacing: -0.02em;
 }
 
+@keyframes checkmarkBounce {
+  0%, 100% { transform: translateY(0px) scaleY(1); }
+  25% { transform: translateY(-3px) scaleY(1.02); }
+  50% { transform: translateY(0px) scaleY(1); }
+  75% { transform: translateY(-1px) scaleY(0.98); }
+}
+
 @keyframes baseballPitch {
   0%, 100% { transform: translateX(0px) translateY(0px) scaleX(1); }
   25% { transform: translateX(-2px) translateY(-1px) scaleX(0.99); }
@@ -391,6 +495,13 @@
   font-style: italic;
   opacity: 0.8;
   transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.amir-mode .subtitle {
+  color: #dcfce7;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
 }
 
 .ajai-mode .subtitle {
@@ -419,6 +530,12 @@
   transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.amir-mode .chat-container {
+  background: rgba(34, 197, 94, 0.3);
+  border: 2px solid #22c55e;
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.2), 0 4px 16px rgba(34, 197, 94, 0.2);
+}
+
 .ajai-mode .chat-container {
   background: rgba(44, 85, 48, 0.3);
   border: 2px solid #2c5530;
@@ -445,6 +562,11 @@
   padding: 15px;
   border-radius: 10px;
   transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.amir-mode .chat-messages {
+  background: rgba(0,0,0,0.15);
+  border: 1px solid #22c55e;
 }
 
 .ajai-mode .chat-messages {
@@ -476,6 +598,11 @@
   transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.amir-mode .user-message {
+  background: rgba(34, 197, 94, 0.2);
+  border: 1px solid #22c55e;
+}
+
 .ajai-mode .user-message {
   background: rgba(74, 124, 89, 0.2);
   border: 1px solid #4a7c59;
@@ -497,6 +624,11 @@
   transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.amir-mode .bot-message {
+  background: rgba(34, 197, 94, 0.3);
+  border: 1px solid #22c55e;
+}
+
 .ajai-mode .bot-message {
   background: rgba(44, 85, 48, 0.3);
   border: 1px solid #2c5530;
@@ -510,6 +642,15 @@
 .normal-mode .bot-message {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.amir-mode .bot-message::before {
+  content: '✅';
+  position: absolute;
+  left: -25px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
 }
 
 .ajai-mode .bot-message::before {
@@ -555,6 +696,13 @@
   transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.amir-mode .message-input {
+  background: rgba(0,0,0,0.2);
+  border: 2px solid #22c55e;
+  color: #dcfce7;
+  font-family: 'Inter', sans-serif;
+}
+
 .ajai-mode .message-input {
   background: rgba(0,0,0,0.2);
   border: 2px solid #2c5530;
@@ -576,6 +724,11 @@
   font-family: 'Inter', sans-serif;
 }
 
+.amir-mode .message-input::placeholder {
+  color: rgba(220, 252, 231, 0.6);
+  font-style: italic;
+}
+
 .ajai-mode .message-input::placeholder {
   color: rgba(168, 216, 176, 0.6);
   font-style: italic;
@@ -589,6 +742,12 @@
 .normal-mode .message-input::placeholder {
   color: rgba(255, 255, 255, 0.5);
   font-style: italic;
+}
+
+.amir-mode .message-input:focus {
+  outline: none;
+  border-color: #16a34a;
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.4);
 }
 
 .ajai-mode .message-input:focus {
@@ -619,6 +778,14 @@
   border: 2px solid;
 }
 
+.amir-mode .send-button {
+  background: linear-gradient(45deg, #22c55e, #16a34a);
+  border-color: #22c55e;
+  color: #dcfce7;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+}
+
 .ajai-mode .send-button {
   background: linear-gradient(45deg, #2c5530, #4a7c59);
   border-color: #4a7c59;
@@ -640,6 +807,12 @@
   color: #ffffff;
   font-family: 'Inter', sans-serif;
   font-weight: 600;
+}
+
+.amir-mode .send-button:hover {
+  background: linear-gradient(45deg, #16a34a, #22c55e);
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(34, 197, 94, 0.5);
 }
 
 .ajai-mode .send-button:hover {
@@ -677,6 +850,14 @@
   border: 2px solid;
 }
 
+.amir-mode .upload-button {
+  background: rgba(34, 197, 94, 0.6);
+  border-color: #22c55e;
+  color: #dcfce7;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+}
+
 .ajai-mode .upload-button {
   background: rgba(44, 85, 48, 0.6);
   border-color: #2c5530;
@@ -698,6 +879,11 @@
   color: #ffffff;
   font-family: 'Inter', sans-serif;
   font-weight: 500;
+}
+
+.amir-mode .upload-button:hover {
+  background: rgba(34, 197, 94, 0.8);
+  transform: translateY(-2px);
 }
 
 .ajai-mode .upload-button:hover {
@@ -842,6 +1028,11 @@
 .generated-image:hover {
   transform: scale(1.02);
   cursor: pointer;
+}
+
+.amir-mode .generated-image {
+  border: 3px solid #22c55e;
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
 }
 
 .ajai-mode .generated-image {
