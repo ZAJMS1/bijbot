@@ -13,11 +13,13 @@ interface Message {
 }
 
 export default function Home() {
-  const [currentMode, setCurrentMode] = useState<'bijo' | 'normal'>('bijo')
+  const [currentMode, setCurrentMode] = useState<'bijo' | 'normal' | 'ajai'>('bijo')
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [showModeDropdown, setShowModeDropdown] = useState(false)
   
   const bijoWelcome = 'Oh for mil? I\'m Bijo, your slithery AI assistant! *adjusts stinky socks* I can help you with pretty much anything - analyzing files, answering questions, examining images, reading PDFs, and more. I might be a bit gross and overconfident, but I actually give good answers. What do you need help with? 🐍'
+  
+  const ajaiWelcome = '*adjusts baseball cap calmly* Hey there, Givan. I\'m AJ. I can help you with pretty much anything - analyzing files, answering questions, looking at images, reading documents. I don\'t mind tackling whatever you need. What can I do for you? ⚾'
   
   const normalWelcome = 'Hello! I\'m your AI assistant. I can help you with a wide variety of tasks including analyzing files, answering questions, generating content, and more. I can process images, PDFs, documents, code files, and many other file types. How can I assist you today?'
   
@@ -62,7 +64,7 @@ export default function Home() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [showModeDropdown])
 
-  const switchMode = (newMode: 'bijo' | 'normal') => {
+  const switchMode = (newMode: 'bijo' | 'normal' | 'ajai') => {
     if (newMode === currentMode) {
       setShowModeDropdown(false)
       return
@@ -75,9 +77,21 @@ export default function Home() {
       setCurrentMode(newMode)
       
       // Update welcome message when switching modes
+      let welcomeMessage: string
+      switch (newMode) {
+        case 'bijo':
+          welcomeMessage = bijoWelcome
+          break
+        case 'ajai':
+          welcomeMessage = ajaiWelcome
+          break
+        default:
+          welcomeMessage = normalWelcome
+      }
+      
       setMessages([{
         role: 'assistant',
-        content: newMode === 'bijo' ? bijoWelcome : normalWelcome
+        content: welcomeMessage
       }])
       
       // Clear any uploaded file and input
@@ -119,9 +133,17 @@ export default function Home() {
         setError(errorData.error || 'Failed to process file')
       }
     } catch (err) {
-      const errorMessage = currentMode === 'bijo'
-        ? 'EHHH WHAT THE SHIT! Failed to upload file. Are you stupid?'
-        : 'Failed to upload file. Please try again.'
+      let errorMessage: string
+      switch (currentMode) {
+        case 'bijo':
+          errorMessage = 'EHHH WHAT THE SHIT! Failed to upload file. Are you stupid?'
+          break
+        case 'ajai':
+          errorMessage = 'I don\'t mind trying, Luo, but that file upload didn\'t work. Let\'s try again.'
+          break
+        default:
+          errorMessage = 'Failed to upload file. Please try again.'
+      }
       setError(errorMessage)
     }
   }
@@ -169,9 +191,17 @@ export default function Home() {
         image: data.image
       }])
     } catch (err) {
-      const errorMessage = currentMode === 'bijo'
-        ? 'EHHH WHAT THE SHIT! Something went wrong. Are you stupid? Try again!'
-        : 'I apologize, but something went wrong. Please try again.'
+      let errorMessage: string
+      switch (currentMode) {
+        case 'bijo':
+          errorMessage = 'EHHH WHAT THE SHIT! Something went wrong. Are you stupid? Try again!'
+          break
+        case 'ajai':
+          errorMessage = 'I don\'t mind that there was an error, Givan, but something went wrong. Let\'s try that again.'
+          break
+        default:
+          errorMessage = 'I apologize, but something went wrong. Please try again.'
+      }
       setError(errorMessage)
     } finally {
       setLoading(false)
@@ -186,17 +216,21 @@ export default function Home() {
   }
 
   return (
-    <div className={`app-container ${currentMode === 'bijo' ? 'bijo-mode' : 'normal-mode'} ${isTransitioning ? 'transitioning' : ''}`}>
+    <div className={`app-container ${currentMode === 'bijo' ? 'bijo-mode' : currentMode === 'ajai' ? 'ajai-mode' : 'normal-mode'} ${isTransitioning ? 'transitioning' : ''}`}>
       <div className="container">
         <div className="header">
           <div className="header-content">
             <div className="title-section">
               <h1 className="title">
-                {currentMode === 'bijo' ? 'BIJO AI' : 'AI Assistant'}
+                {currentMode === 'bijo' ? 'BIJO AI' : 
+                 currentMode === 'ajai' ? 'AJ AI' : 
+                 'AI Assistant'}
               </h1>
               <p className="subtitle">
                 {currentMode === 'bijo'
                   ? 'The Stinkiest, Most Revolting AI Assistant' 
+                  : currentMode === 'ajai'
+                  ? 'Calm, Composed Baseball Player & IB Student'
                   : 'Your Intelligent Assistant for Any Task'
                 }
               </p>
@@ -208,7 +242,9 @@ export default function Home() {
                 disabled={isTransitioning}
               >
                 <span className="toggle-text">
-                  {currentMode === 'bijo' ? 'Bijo Mode' : 'Normal Mode'}
+                  {currentMode === 'bijo' ? 'Bijo Mode' : 
+                   currentMode === 'ajai' ? 'AJ Mode' : 
+                   'Normal Mode'}
                 </span>
                 <span className="dropdown-arrow">▼</span>
               </button>
@@ -219,6 +255,12 @@ export default function Home() {
                     className={`mode-option ${currentMode === 'bijo' ? 'active' : ''}`}
                   >
                     🐍 Bijo Mode
+                  </button>
+                  <button 
+                    onClick={() => switchMode('ajai')}
+                    className={`mode-option ${currentMode === 'ajai' ? 'active' : ''}`}
+                  >
+                    ⚾ AJ Mode
                   </button>
                   <button 
                     onClick={() => switchMode('normal')}
@@ -259,7 +301,9 @@ export default function Home() {
               <div className="loading">
                 <span>
                   {currentMode === 'bijo' 
-                    ? 'Bijo is slithering around thinking' 
+                    ? 'Bijo is slithering around thinking'
+                    : currentMode === 'ajai'
+                    ? 'AJ is calmly thinking this through'
                     : 'Processing your request'
                   }
                 </span>
@@ -313,9 +357,11 @@ accept="*"
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder={uploadedFile 
-              ? `Describe what you want ${currentMode === 'bijo' ? 'Bijo' : 'me'} to do with ${uploadedFile.name}...` 
+              ? `Describe what you want ${currentMode === 'bijo' ? 'Bijo' : currentMode === 'ajai' ? 'AJ' : 'me'} to do with ${uploadedFile.name}...` 
               : currentMode === 'bijo'
-                ? "Ask Bijo something... if you dare 🐍" 
+                ? "Ask Bijo something... if you dare 🐍"
+                : currentMode === 'ajai' 
+                ? "What can I help you with, Givan? ⚾"
                 : "How can I help you today?"
             }
             className="message-input"
@@ -328,8 +374,8 @@ accept="*"
             className="send-button"
           >
             {loading 
-              ? (currentMode === 'bijo' ? '🐍💭' : 'Thinking...') 
-              : (currentMode === 'bijo' ? '💩 Send' : 'Send')
+              ? (currentMode === 'bijo' ? '🐍💭' : currentMode === 'ajai' ? '⚾💭' : 'Thinking...') 
+              : (currentMode === 'bijo' ? '💩 Send' : currentMode === 'ajai' ? '⚾ Send' : 'Send')
             }
           </button>
         </div>
