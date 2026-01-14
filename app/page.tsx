@@ -21,7 +21,7 @@ export default function Home() {
   
   const ajaiWelcome = '*adjusts baseball cap calmly* Hey there, Givan. I\'m AJ. I can help you with pretty much anything - analyzing files, answering questions, looking at images, reading documents. I don\'t mind tackling whatever you need. What can I do for you? ⚾'
   
-  const amirWelcome = 'Okay ✅ i am Pratham prending! i working at Nawabs Indian Cuisine in Springfield ✅ i can helping with filesi, questionsi, imagesi, whateveri you needing! what to doing today prending ✅'
+  const amirWelcome = 'Okay ✅ i am Pratham prending! i working at Nawabs Indian Cuisine in Springfield ✅ i can helping with files, questions, images, whatever you needing broti! what to doing today ✅ tro'
   
   const normalWelcome = 'Hello! I\'m your AI assistant. I can help you with a wide variety of tasks including analyzing files, answering questions, generating content, and more. I can process images, PDFs, documents, code files, and many other file types. How can I assist you today?'
   
@@ -147,7 +147,7 @@ export default function Home() {
           errorMessage = 'I don\'t mind trying, Luo, but that file upload didn\'t work. Let\'s try again.'
           break
         case 'amir':
-          errorMessage = 'Okay ✅ file no uploading prending... somethingi wrongi ✅ Try again methodi'
+          errorMessage = 'Okay ✅ file no uploading broti... something wrong ✅ Try again method xro'
           break
         default:
           errorMessage = 'Failed to upload file. Please try again.'
@@ -208,7 +208,7 @@ export default function Home() {
           errorMessage = 'I don\'t mind that there was an error, Givan, but something went wrong. Let\'s try that again.'
           break
         case 'amir':
-          errorMessage = 'Okay ✅ somethingi wrongi happening prending... i canting working righti now ✅ Try again methodi'
+          errorMessage = 'Okay ✅ something wrong happening broti... i canting working right now ✅ Try again method mro'
           break
         default:
           errorMessage = 'I apologize, but something went wrong. Please try again.'
