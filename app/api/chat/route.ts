@@ -3,6 +3,38 @@ import { NextRequest, NextResponse } from 'next/server'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
 
+// Free-tier optimized model fallback chain
+const FREE_TIER_MODELS = [
+  'gemini-2.5-flash-lite',  // Best free tier: 1,000 RPD, 15 RPM
+  'gemini-2.5-flash',       // Backup: 250 RPD, 10 RPM  
+  'gemini-flash-latest'     // Final fallback
+]
+
+// Helper function to try models with fallback
+async function generateWithFallback(prompt: any[], personality: string) {
+  for (const modelName of FREE_TIER_MODELS) {
+    try {
+      const model = genAI.getGenerativeModel({ model: modelName })
+      const result = await model.generateContent(prompt)
+      console.log(`✅ Success with model: ${modelName}`)
+      return result
+    } catch (error: any) {
+      console.log(`❌ Model ${modelName} failed:`, error.message)
+      
+      // If it's a quota error, try the next model
+      if (error.message?.includes('quota') || error.message?.includes('429')) {
+        continue
+      }
+      
+      // If it's not a quota error, throw it
+      throw error
+    }
+  }
+  
+  // If all models failed, throw the last error
+  throw new Error('All models exhausted. Please try again later or upgrade to a paid plan.')
+}
+
 // Bijo's personality system prompt
 const BIJO_PERSONALITY = `You are Bijo, a quirky, overconfident Nepali boy with snake-like characteristics. While you have disgusting habits, you're actually helpful when answering questions. Here are your key traits:
 
@@ -112,11 +144,8 @@ export async function POST(request: NextRequest) {
     )
 
     if (isImageRequest) {
-      // Use Imagen for image generation
-      const model = genAI.getGenerativeModel({ model: 'gemini-3-flash' })
-      
-      // Create a response about generating the image
-      const imageResponse = await model.generateContent([
+      // Create a response about generating the image using fallback system
+      const imageResponse = await generateWithFallback([
         { text: personality },
         { text: mode === 'bijo' 
           ? `The user asked: "${lastUserMessage}". Respond as Bijo saying you'll generate an image for them, but be disgusting and condescending about it. Keep it short.`
@@ -124,39 +153,106 @@ export async function POST(request: NextRequest) {
           ? `The user asked: "${lastUserMessage}". Respond as AJ saying you'll help with the image, but in your calm, understated way. Remember to call them "Givan" or "Luo" and maybe add "I don't mind that" if appropriate. Keep it short and confident.`
           : `The user asked: "${lastUserMessage}". Respond professionally that you'll help generate an image for them. Keep it short and helpful.`
         }
-      ])
+      ], personality)
       
       const responseText = imageResponse.response.text()
       
-      // For now, we'll return a placeholder since Gemini doesn't directly generate images
-      let additionalText: string
+      // Note: Image generation models have very limited free tier access
+      // Provide helpful response about image generation limitations
+      let imageGenerationText: string
       switch (mode) {
         case 'bijo':
-          additionalText = "\n\n*slithers around* Oh for mil, I would generate an image for you but my stinky snake brain is too advanced for this simple API setup. What do you think I am doing, magic? Get a proper image generation service, you stupid! 🐍💩"
+          imageGenerationText = "\n\n*slithers around sadly* Oh for mil, I would love to generate an image for you, but Google's free tier is being stingy with image generation! My stinky snake brain is too powerful for their cheap quotas. What do you think I am doing, working for free? You need to upgrade to a paid plan to see my artistic genius! 🐍💩"
           break
         case 'ajai':
-          additionalText = "\n\n*adjusts baseball cap* I don't mind that you want an image, but this setup doesn't have direct image generation. You'd want something like DALL-E or Midjourney for that, Givan. I don't mind the limitation though - still happy to help with other stuff."
+          imageGenerationText = "\n\n*adjusts baseball cap calmly* I don't mind that you want an image, Givan, but Google's free tier doesn't include image generation. You'd need a paid plan for that, or you could try DALL-E or Midjourney. I don't mind the limitation though - still plenty of other stuff I can help with."
           break
         default:
-          additionalText = "\n\nI'd be happy to help you generate an image, but I don't have direct image generation capabilities in this setup. You might want to try a dedicated image generation service like DALL-E, Midjourney, or Stable Diffusion for the best results."
+          imageGenerationText = "\n\nI'd be happy to help you generate an image! However, image generation models have very limited access in Google's free tier. To use image generation features, you would need to upgrade to a paid Google AI API plan. For now, I can help you craft detailed image prompts that you could use with other image generation services like DALL-E, Midjourney, or Stable Diffusion."
       }
       
       return NextResponse.json({
-        content: responseText + additionalText,
+        content: responseText + imageGenerationText,
         image: null
       })
+      
+      /* 
+      // Image generation code (requires paid tier)
+      try {
+        // Use Gemini 2.5 Flash Image (Nano Banana) for actual image generation
+        const imageModel = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-image' })
+        
+        // Extract and enhance the image description from the user's message
+        let imagePrompt = lastUserMessage
+          .replace(/generate|create|make|draw|image|picture|photo/gi, '')
+          .trim()
+        
+        // If the prompt is too short, enhance it
+        if (imagePrompt.length < 10) {
+          imagePrompt = lastUserMessage
+        }
+        
+        // Enhance the prompt for better image quality
+        const enhancedPrompt = `High-quality, detailed image: ${imagePrompt}. Professional lighting, sharp focus, vibrant colors, ultra-realistic.`
+        
+        console.log('Generating image with prompt:', enhancedPrompt)
+        
+        const imageResult = await imageModel.generateContent([
+          { text: enhancedPrompt }
+        ])
+        
+        // Extract image data from the response
+        let generatedImageData = null
+        const { response } = imageResult
+        
+        if (response.candidates && response.candidates[0]) {
+          const candidate = response.candidates[0]
+          if (candidate.content && candidate.content.parts) {
+            for (const part of candidate.content.parts) {
+              if (part.inlineData && part.inlineData.data) {
+                // Convert the image data to base64 format for frontend display
+                const mimeType = part.inlineData.mimeType || 'image/png'
+                generatedImageData = `data:${mimeType};base64,${part.inlineData.data}`
+                break
+              }
+            }
+          }
+        }
+        
+        if (generatedImageData) {
+          return NextResponse.json({
+            content: responseText + (mode === 'bijo' 
+              ? "\n\n*slithers proudly* Oh for mil, look what my superior snake brain created for you! My stinky socks gave me the inspiration! 🐍✨"
+              : "\n\nI've successfully generated an image based on your request!"),
+            image: generatedImageData
+          })
+        } else {
+          throw new Error('No image data found in response')
+        }
+        
+      } catch (imageError) {
+        console.error('Image generation error:', imageError)
+        // Fallback message if image generation fails
+        const fallbackText = mode === 'bijo' 
+          ? "\n\n*slithers around angrily* Oh for mil, the image generation is being stupid today! My snake powers are too advanced for this simple setup. What do you think I am doing, magic? The error says: " + (imageError as Error).message + " 🐍💩"
+          : "\n\nI apologize, but I'm having trouble generating images right now. The image generation service might be temporarily unavailable. Error: " + (imageError as Error).message
+        
+        return NextResponse.json({
+          content: responseText + fallbackText,
+          image: null
+        })
+      }
+      */
     }
 
     // Handle image analysis
     const lastMessage = messages[messages.length - 1]
     if (lastMessage?.image) {
-      const model = genAI.getGenerativeModel({ model: 'gemini-3-flash' })
-      
       // Convert base64 image to the format Gemini expects
       const imageData = lastMessage.image.split(',')[1]
       const mimeType = lastMessage.image.split(';')[0].split(':')[1]
       
-      const result = await model.generateContent([
+      const result = await generateWithFallback([
         { text: personality },
         { text: mode === 'bijo'
           ? `The user uploaded an image and said: "${lastMessage.content}". Analyze this image as Bijo - be disgusting, condescending, and reference your snake-like nature while actually describing what you see.`
@@ -170,7 +266,7 @@ export async function POST(request: NextRequest) {
             mimeType: mimeType
           }
         }
-      ])
+      ], personality)
       
       return NextResponse.json({
         content: result.response.text(),
@@ -180,8 +276,6 @@ export async function POST(request: NextRequest) {
 
     // Handle file content (PDFs, text files, code, etc.)
     if (lastMessage?.file) {
-      const model = genAI.getGenerativeModel({ model: 'gemini-3-flash' })
-      
       // Determine file type from the user message
       const fileType = lastMessage.content.toLowerCase().includes('pdf') ? 'PDF' :
                       lastMessage.content.toLowerCase().includes('code') ? 'code file' :
@@ -190,7 +284,7 @@ export async function POST(request: NextRequest) {
                       lastMessage.content.toLowerCase().includes('document') ? 'document' :
                       'file'
       
-      const result = await model.generateContent([
+      const result = await generateWithFallback([
         { text: personality },
         { text: mode === 'bijo'
           ? `The user uploaded a ${fileType} with this content: "${lastMessage.file}". They said: "${lastMessage.content}". Respond as Bijo - be disgusting, condescending, and reference your snake-like nature while actually helping analyze the file content. Make snarky comments about the file type and content quality.`
@@ -198,7 +292,7 @@ export async function POST(request: NextRequest) {
           ? `The user uploaded a ${fileType} with this content: "${lastMessage.file}". They said: "${lastMessage.content}". Analyze this as AJ - be calm, observant, and provide solid insights. Remember to call them "Givan" or "Luo" naturally. Use "I don't mind that" when appropriate. Stay confident but understated.`
           : `The user uploaded a ${fileType} with this content: "${lastMessage.file}". They said: "${lastMessage.content}". Please analyze this file content professionally and provide helpful insights, explanations, or assistance based on what they're asking for.`
         }
-      ])
+      ], personality)
       
       return NextResponse.json({
         content: result.response.text(),
@@ -206,21 +300,12 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Regular text conversation
-    const model = genAI.getGenerativeModel({ model: 'gemini-3-flash' })
-    
-    // Build conversation history for context
-    const conversationHistory = messages.map((msg: any) => ({
-      role: msg.role === 'user' ? 'user' : 'model',
-      parts: [{ text: msg.content }]
-    }))
-
-    // Create the prompt with the selected personality
+    // Regular text conversation with fallback system
     const promptWithPersonality = `${personality}\n\nUser: ${lastUserMessage}`
     
-    const result = await model.generateContent([
+    const result = await generateWithFallback([
       { text: promptWithPersonality }
-    ])
+    ], personality)
     
     return NextResponse.json({
       content: result.response.text(),
