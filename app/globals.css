@@ -89,9 +89,9 @@
   z-index: 1;
 }
 
-/* Stink clouds floating animation - Bijo mode only */
+/* Snake floating animation - Bijo mode only */
 .bijo-mode::before {
-  content: '💨 💩 🤢 💨 🦨 💨 💩 🤮 💨';
+  content: '🐍 ✨ 🐍 💎 🐍 ⚡ 🐍 🎮 🐍';
   position: fixed;
   top: -50px;
   left: -100px;
@@ -99,7 +99,7 @@
   height: 100px;
   font-size: 2rem;
   opacity: 0.3;
-  animation: floatStink 15s linear infinite;
+  animation: floatSnake 15s linear infinite;
   pointer-events: none;
   z-index: 1;
 }
@@ -109,7 +109,7 @@
   100% { transform: translateX(100vw) rotate(360deg); }
 }
 
-@keyframes floatStink {
+@keyframes floatSnake {
   0% { transform: translateX(-100px) rotate(0deg); }
   100% { transform: translateX(100vw) rotate(360deg); }
 }
@@ -842,6 +842,11 @@
 .generated-image:hover {
   transform: scale(1.02);
   cursor: pointer;
+}
+
+.ajai-mode .generated-image {
+  border: 3px solid #4a7c59;
+  box-shadow: 0 4px 12px rgba(74, 124, 89, 0.3);
 }
 
 .bijo-mode .generated-image {

@@ -17,7 +17,7 @@ export default function Home() {
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [showModeDropdown, setShowModeDropdown] = useState(false)
   
-  const bijoWelcome = 'Oh for mil? I\'m Bijo, your slithery AI assistant! *adjusts stinky socks* I can help you with pretty much anything - analyzing files, answering questions, examining images, reading PDFs, and more. I might be a bit gross and overconfident, but I actually give good answers. What do you need help with? 🐍'
+  const bijoWelcome = 'Oh for mil? I\'m Bijo, your slithery AI assistant! *slithers confidently* I can help you with pretty much anything - analyzing files, answering questions, examining images, reading PDFs, and more. I might be overconfident, but I actually give good answers. What do you need help with? 🐍'
   
   const ajaiWelcome = '*adjusts baseball cap calmly* Hey there, Givan. I\'m AJ. I can help you with pretty much anything - analyzing files, answering questions, looking at images, reading documents. I don\'t mind tackling whatever you need. What can I do for you? ⚾'
   
@@ -228,7 +228,7 @@ export default function Home() {
               </h1>
               <p className="subtitle">
                 {currentMode === 'bijo'
-                  ? 'The Stinkiest, Most Revolting AI Assistant' 
+                  ? 'The Slithery, Most Overconfident AI Assistant' 
                   : currentMode === 'ajai'
                   ? 'Calm, Composed Baseball Player & IB Student'
                   : 'Your Intelligent Assistant for Any Task'
@@ -375,7 +375,7 @@ accept="*"
           >
             {loading 
               ? (currentMode === 'bijo' ? '🐍💭' : currentMode === 'ajai' ? '⚾💭' : 'Thinking...') 
-              : (currentMode === 'bijo' ? '💩 Send' : currentMode === 'ajai' ? '⚾ Send' : 'Send')
+              : (currentMode === 'bijo' ? '🐍 Send' : currentMode === 'ajai' ? '⚾ Send' : 'Send')
             }
           </button>
         </div>
